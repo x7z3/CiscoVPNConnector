@@ -20,6 +20,9 @@ namespace CiscoVPNConnecter
         private const string ConnectSign = "▶";
         private const string ConnectTooltipText = "Connect";
 
+        private const string ConnectingSign = "⌛";
+        private const string ConnectingTooltipText = "Connecting";
+
         private readonly string _fileName = "CiscoVpnConnector.json";
         private readonly string _userProfileDir = Environment.GetEnvironmentVariable("USERPROFILE");
         private readonly string _settingsFile;
@@ -50,14 +53,8 @@ namespace CiscoVPNConnecter
         {
             foreach (var button in buttons)
             {
-                if (areButtonsConnected)
-                {
-                    ButtonConnectedState(button);
-                }
-                else
-                {
-                    ButtonDisconnectedState(button);
-                }
+                if (areButtonsConnected) ButtonConnectedState(button);
+                else ButtonDisconnectedState(button);
             }
         }
 
@@ -100,21 +97,40 @@ namespace CiscoVPNConnecter
 
         private void ButtonConnectedState(Button button)
         {
-            button.Background = Brushes.Green;
-            button.Content = DisconnectSign;
-            button.ToolTip = DisconnectTooltipText;
+            button.Dispatcher.Invoke(() =>
+            {
+                button.Background = Brushes.Green;
+                button.Content = DisconnectSign;
+                button.ToolTip = DisconnectTooltipText;
+                button.IsEnabled = true;
+            });
         }
 
         private void ButtonDisconnectedState(Button button)
         {
-            button.Background = Brushes.Orange;
-            button.Content = ConnectSign;
-            button.ToolTip = ConnectTooltipText;
+            button.Dispatcher.Invoke(() =>
+            {
+                button.Background = Brushes.Orange;
+                button.Content = ConnectSign;
+                button.ToolTip = ConnectTooltipText;
+                button.IsEnabled = true;
+            });
+
+        }
+
+        private void ButtonWaitState(Button button)
+        {
+            button.Dispatcher.Invoke(() =>
+            {
+                button.Content = ConnectingSign;
+                button.ToolTip = ConnectingTooltipText;
+                button.IsEnabled = false;
+            });
         }
 
         private void EnableButtons(bool enableButtons, params Button[] buttons)
         {
-            foreach (var button in buttons) button.IsEnabled = enableButtons;
+            foreach (var button in buttons) button.Dispatcher.Invoke(() => button.IsEnabled = enableButtons);
         }
 
         private void ButtonsState(bool setConnectedState, params Button[] buttons)
@@ -124,12 +140,12 @@ namespace CiscoVPNConnecter
                 if (setConnectedState) ButtonConnectedState(button);
                 else ButtonDisconnectedState(button);
             }
-                
         }
 
         private void ConnectAndChangeButtonState(string host, Button button, params Button[] otherButtons)
         {
-
+            ButtonWaitState(button);
+            EnableButtons(false, VpnConnect_1, VpnConnect_2, VpnConnect_3);
             if (!VpnConnector.IsConnected())
             {
                 if (Connect(host))
@@ -154,19 +170,19 @@ namespace CiscoVPNConnecter
             return VpnConnector.Connect(host, _appSettings.UserName, _appSettings.UserPassword);
         }
 
-        private void VpnConnect_1_Click(object sender, RoutedEventArgs e)
+        private async void VpnConnect_1_Click(object sender, RoutedEventArgs e)
         {
-            ConnectAndChangeButtonState(_appSettings.VpnHost_1, (Button)sender, VpnConnect_2, VpnConnect_3);
+            await Task.Run(() => ConnectAndChangeButtonState(_appSettings.VpnHost_1, (Button)sender, VpnConnect_2, VpnConnect_3));
         }
 
-        private void VpnConnect_2_Click(object sender, RoutedEventArgs e)
+        private async void VpnConnect_2_Click(object sender, RoutedEventArgs e)
         {
-            ConnectAndChangeButtonState(_appSettings.VpnHost_2, (Button)sender, VpnConnect_1, VpnConnect_3);
+            await Task.Run(() => ConnectAndChangeButtonState(_appSettings.VpnHost_2, (Button)sender, VpnConnect_1, VpnConnect_3));
         }
 
-        private void VpnConnect_3_Click(object sender, RoutedEventArgs e)
+        private async void VpnConnect_3_Click(object sender, RoutedEventArgs e)
         {
-            ConnectAndChangeButtonState(_appSettings.VpnHost_3, (Button)sender, VpnConnect_1, VpnConnect_2);
+            await Task.Run(() => ConnectAndChangeButtonState(_appSettings.VpnHost_3, (Button)sender, VpnConnect_1, VpnConnect_2));
         }
     }
 }

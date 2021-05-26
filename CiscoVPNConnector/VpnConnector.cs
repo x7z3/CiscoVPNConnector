@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
 
@@ -34,12 +30,15 @@ namespace CiscoVPNConnecter
                 RedirectStandardInput = true,
                 RedirectStandardError = true
             };
+        }
 
+        private static void KillCiscoVpnProcesses()
+        {
             Process[] processes = Process.GetProcesses();
-            foreach (var proc in processes)
+            foreach (var process in processes)
             {
-                if (proc.ProcessName.Contains("vpnui")) proc.Kill();
-                if (proc.ProcessName.Contains("vpncli")) proc.Kill();
+                if (process.ProcessName.Contains("vpnui")) process.Kill();
+                if (process.ProcessName.Contains("vpncli")) process.Kill();
             }
         }
 
@@ -51,7 +50,7 @@ namespace CiscoVPNConnecter
             tw.WriteLine($"{userPassword}");
             tw.Close();
 
-            SetArgumentsAndStartProcess($"/C \"{_vpnCliExe} -s < {_connectionFile}\"");           
+            SetArgumentsAndStartProcess($"/C \"{_vpnCliExe} -s < {_connectionFile}\"");
             return IsConnected();
         }
 
@@ -71,6 +70,7 @@ namespace CiscoVPNConnecter
 
         private static void SetArgumentsAndStartProcess(string arguments)
         {
+            KillCiscoVpnProcesses();
             _vpncliProcess.Close();
             _vpncliProcessStartInfo.Arguments = arguments;
             _vpncliProcess.StartInfo = _vpncliProcessStartInfo;

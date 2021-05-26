@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CiscoVPNConnecter
+﻿namespace CiscoVPNConnecter
 {
     class AppSettingsModel
     {
