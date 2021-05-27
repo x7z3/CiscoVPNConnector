@@ -36,10 +36,18 @@ namespace CiscoVPNConnecter
             ReadSettings();
             SetWindowSettings(_appSettings);
 
-            if (VpnConnector.IsConnected())
-                SetButtonsState(true, VpnConnect_1, VpnConnect_2, VpnConnect_3);
-            else
-                SetButtonsState(false, VpnConnect_1, VpnConnect_2, VpnConnect_3);
+            try
+            {
+                if (VpnConnector.IsConnected())
+                    SetButtonsState(true, VpnConnect_1, VpnConnect_2, VpnConnect_3);
+                else
+                    SetButtonsState(false, VpnConnect_1, VpnConnect_2, VpnConnect_3);
+            }
+            catch (TypeInitializationException e)
+            {
+                MessageBox.Show(e.InnerException.Message, "Bad luck :(", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
+            }
 
         }
 

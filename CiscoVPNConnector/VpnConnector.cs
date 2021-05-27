@@ -18,7 +18,11 @@ namespace CiscoVPNConnecter
 
         static VpnConnector()
         {
-            _vpnCliExePath = File.Exists(_vpnCliPath86) ? _vpnCliPath86 : _vpnCliPath64;
+            _vpnCliExePath = File.Exists(_vpnCliPath86) 
+                ? _vpnCliPath86 
+                : File.Exists(_vpnCliPath64) 
+                ? _vpnCliPath64 
+                : throw new FileNotFoundException("Vpncli.exe is not found on your system. Probably \"Cisco AnyConnect\" is not installed.");
             _vpnCliDirPath = _vpnCliExePath.Replace(@"\vpncli.exe", "");
 
             _vpncliProcessStartInfo = new()
