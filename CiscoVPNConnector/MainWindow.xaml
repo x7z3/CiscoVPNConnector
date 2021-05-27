@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CiscoVPNConnecter"
         mc:Ignorable="d"
         Title="CiscoVpnConnector" MaxHeight="200" Height="200" Width="250"
-        Name="MainWin" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Name="MainWin" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
     <Grid VerticalAlignment="Top" Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
